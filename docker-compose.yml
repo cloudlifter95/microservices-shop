@@ -1,0 +1,83 @@
+services:
+  auth:
+    extends:
+      file: auth/docker-compose.yml
+      service: app
+    env_file: .env
+    networks:
+      - shop-intranet
+    volumes:
+      - shop-data:/app
+    depends_on:
+      nats-broker:
+        condition: service_healthy
+
+  notifications:
+    extends:
+      file: notifications/docker-compose.yml
+      service: app
+    env_file: .env
+    networks:
+      - shop-intranet # Add this manually if needed
+    depends_on:
+      nats-broker:
+        condition: service_healthy
+
+  orders:
+    extends:
+      file: orders/docker-compose.yml
+      service: app
+    env_file: .env
+    networks:
+      - shop-intranet
+    depends_on:
+      nats-broker:
+        condition: service_healthy
+
+  products:
+    extends:
+      file: products/docker-compose.yml
+      service: app
+    env_file: .env
+    networks:
+      - shop-intranet
+    depends_on:
+      nats-broker:
+        condition: service_healthy
+
+  nats-broker:
+    image: nats:2.9-alpine
+    healthcheck:
+      test: ["CMD", "wget", "-q", "http://0.0.0.0:8222"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shop-intranet
+
+  nginx:
+    image: nginx:1.25-alpine
+    ports:
+      - 80:80
+    networks:
+      - shop-intranet # Add this manually if needed
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      nats-broker:
+        condition: service_healthy
+      products:
+        condition: service_started
+      orders:
+        condition: service_started
+      notifications:
+        condition: service_started
+      auth:
+        condition: service_started
+
+networks:
+  shop-intranet:
+    driver: bridge # Explicitly set the driver type if default isn't working
+
+volumes:
+  shop-data:
