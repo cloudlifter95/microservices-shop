@@ -39,6 +39,8 @@ services:
       file: products/docker-compose.yml
       service: app
     env_file: .env
+    # ports:
+    #   - "4000:4000"
     networks:
       - shop-intranet
     depends_on:

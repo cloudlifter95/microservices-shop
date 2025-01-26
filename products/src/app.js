@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 
 const app = express();
 app.use(express.json());
@@ -6,32 +6,41 @@ app.use(express.json());
 const PORT = process.env.PORT;
 
 app.use((req, res, next) => {
-  res.on('finish', function() {
-    console.log(`${req.method} ${req.url} - ${res.statusCode} ${res.statusMessage}`);
+  res.on("finish", function () {
+    console.log(
+      `${req.method} ${req.url} - ${res.statusCode} ${res.statusMessage}`
+    );
   });
   next();
 });
 
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization');
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, Content-Type, Accept, Authorization"
+  );
 
-  if (req.method === 'OPTIONS') {
-      res.header('Access-Control-Allow-Methods', 'GET, POST');
-      return res.sendStatus(200);
+  if (req.method === "OPTIONS") {
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    return res.sendStatus(200);
   }
   next();
 });
 
-app.get('/', (req, res, next) => {
+app.get("/", (req, res, next) => {
   const { ids } = req.query;
   let resultProducts = products;
 
   if (ids) {
-    const productIds = ids.split(',');
+    const productIds = ids.split(",");
     resultProducts = products.filter((p) => productIds.includes(p.id));
   }
   res.status(200).json(resultProducts);
+});
+
+app.get("/a/", (req, res, next) => {
+  res.status(200).json({});
 });
 
 app.listen(PORT, () => {
@@ -40,33 +49,33 @@ app.listen(PORT, () => {
 
 const products = [
   {
-    id: '1',
-    name: 'Sneakers',
+    id: "1",
+    name: "Sneakers",
     price: 20,
-    keywords: ['shoes', 'footwear']
+    keywords: ["shoes", "footwear"],
   },
   {
-    id: '2',
-    name: 'Half Sleeve Shirt',
+    id: "2",
+    name: "Half Sleeve Shirt",
     price: 15,
-    keywords: ['shirt', 'topwear']
+    keywords: ["shirt", "topwear"],
   },
   {
-    id: '3',
-    name: 'Shorts',
+    id: "3",
+    name: "Shorts",
     price: 8,
-    keywords: ['shorts', 'bottomwear']
+    keywords: ["shorts", "bottomwear"],
   },
   {
-    id: '4',
-    name: 'Full Sleeve Shirt',
+    id: "4",
+    name: "Full Sleeve Shirt",
     price: 18,
-    keywords: ['shirt', 'topwear']
+    keywords: ["shirt", "topwear"],
   },
   {
-    id: '5',
-    name: 'Sunglasses',
+    id: "5",
+    name: "Sunglasses",
     price: 25,
-    keywords: ['accessories', 'sunglasses']
-  }
+    keywords: ["accessories", "sunglasses"],
+  },
 ];
